@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Крипто-Бухгалтерия и Курсы Live</title>
+    <title>Настоящие Курсы Биржи Live и Бухгалтерия</title>
     <style>
         body {
             margin: 0;
@@ -26,7 +26,7 @@
         }
         .accounting-container {
             width: 100%;
-            max-width: 900px;
+            max-width: 800px;
             background-color: #181a20;
             border: 1px solid #2b3139;
             border-radius: 12px;
@@ -85,7 +85,7 @@
             margin-bottom: 5px;
         }
         .total-amount {
-            font-size: 24px;
+            font-size: 22px;
             font-weight: bold;
             color: #0ecb81;
             font-family: monospace;
@@ -129,6 +129,7 @@
             font-weight: bold;
             font-size: 14px;
             transition: opacity 0.2s;
+            width: 100%;
         }
         .btn-add:hover { opacity: 0.9; }
         .type-income { color: #0ecb81; font-weight: bold; }
@@ -136,11 +137,10 @@
         .val-btc { font-family: monospace; font-weight: bold; color: #f3ba2f; }
         .val-money { font-family: monospace; font-weight: bold; color: #ffffff; }
         
-        /* Стили для контейнера информера */
-        .widget-wrapper {
+        .widget-container {
             width: 100%;
-            max-width: 900px;
-            height: 450px;
+            max-width: 800px;
+            height: 500px;
             background-color: #131722;
             border-radius: 12px;
             overflow: hidden;
@@ -151,13 +151,13 @@
 </head>
 <body>
 
-    <!-- 1. БЛОК ТАБЛИЦЫ-БУХГАЛТЕРИИ (ТЕПЕРЬ НАВЕРХУ) -->
+    <!-- БЛОК ТАБЛИЦЫ-БУХГАЛТЕРИИ -->
     <div class="accounting-container">
-        <h2>Учет доходов и расходов в BTC - USD - RUB</h2>
+        <h2>Учет доходов и расходов портфеля</h2>
         
         <div class="config-bar">
             <div class="config-item">
-                <label>Текущий курс BTC в USD (впишите из виджета ниже)</label>
+                <label>Текущий курс BTC в USD (из информера ниже)</label>
                 <input type="number" id="btc-usd-rate" value="95000" oninput="calculateTotalBalance()">
             </div>
             <div class="config-item">
@@ -185,9 +185,9 @@
         <table style="margin-bottom: 15px;">
             <thead>
                 <tr>
-                    <th style="width: 150px;">Тип</th>
-                    <th style="width: 150px;">Количество</th>
-                    <th style="width: 150px;">Валюта ввода</th>
+                    <th style="width: 130px;">Тип</th>
+                    <th style="width: 120px;">Количество</th>
+                    <th style="width: 110px;">Валюта</th>
                     <th>Описание транзакции</th>
                     <th style="width: 120px;">Действие</th>
                 </tr>
@@ -208,14 +208,14 @@
                             <option value="RUB">RUB</option>
                         </select>
                     </td>
-                    <td><input type="text" id="tx-desc" placeholder="Например: Зарплата, Траты"></td>
+                    <td><input type="text" id="tx-desc" placeholder="Например: Покупка на бирже, Траты"></td>
                     <td><button class="btn-add" onclick="addTransaction()">Добавить</button></td>
                 </tr>
             </tbody>
         </table>
 
         <h3>История транзакций</h3>
-        <table id="history-table">
+        <table>
             <thead>
                 <tr>
                     <th>Тип</th>
@@ -231,11 +231,11 @@
 
     <h1>Реальный онлайн-поток криптовалют с бирж</h1>
 
-    <!-- 2. НАДЁЖНЫЙ ВИДЖЕТ ТРАНСЛЯЦИИ КУРСОВ (ТЕПЕРЬ ВНИЗУ И ИЗОЛИРОВАН) -->
-    <div class="widget-wrapper">
+    <!-- ВАШ СТАБИЛЬНЫЙ РАБОЧИЙ ВИДЖЕТ ТРАНСЛЯЦИИ КУРСОВ -->
+    <div class="widget-container">
         <div class="tradingview-widget-container">
             <div class="tradingview-widget-container__widget"></div>
-            <script type="text/javascript" src="https://tradingview.com" async>
+            <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-market-overview.js" async>
             {
               "colorTheme": "dark",
               "dateRange": "12M",
@@ -265,6 +265,7 @@
     </div>
 
     <script>
+        // Стартовый массив транзакций
         let transactions = [
             { type: 'income', amount: 0.5, currency: 'BTC', desc: 'Начальный баланс кошелька' },
             { type: 'expense', amount: 500, currency: 'USD', desc: 'Покупка подписок' }
@@ -322,7 +323,6 @@
             document.getElementById('total-rub').innerText = totalRub.toFixed(2) + ' ₽';
         }
 
-        // Добавление новой транзакции из полей
         function addTransaction() {
             const type = document.getElementById('tx-type').value;
             const amount = parseFloat(document.getElementById('tx-amount').value) || 0;
@@ -342,7 +342,6 @@
             calculateTotalBalance();
         }
 
-        // Первый запуск при открытии страницы
         calculateTotalBalance();
     </script>
 </body>
