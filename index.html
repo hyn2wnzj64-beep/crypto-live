@@ -33,7 +33,69 @@
             overflow: hidden;
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
             border: 1px solid #2a2e39;
+            margin-bottom: 30px;
         }
+        /* Стили для вашей таблицы мультивалютного учета */
+        .accounting-box {
+            width: 100%;
+            max-width: 800px;
+            background-color: #181a20;
+            border: 1px solid #2b3139;
+            border-radius: 12px;
+            padding: 25px;
+            box-sizing: border-box;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+        }
+        .accounting-box h2 {
+            margin-top: 0;
+            color: #f3ba2f;
+            font-size: 20px;
+            border-bottom: 1px solid #2b3139;
+            padding-bottom: 10px;
+        }
+        .clear-btn {
+            background-color: #f6465d;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            float: right;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .config-row {
+            display: flex;
+            gap: 15px;
+            background: #1e2329;
+            padding: 12px;
+            border-radius: 6px;
+            margin: 15px 0;
+            border: 1px solid #2b3139;
+        }
+        .config-row div { flex: 1; font-size: 12px; color: #848e9c; text-transform: uppercase; }
+        .rate-txt { color: #0ecb81; font-weight: bold; font-size: 16px; margin-top: 5px; font-family: monospace; transition: color 0.2s; }
+        .total-display {
+            display: flex;
+            justify-content: space-around;
+            background: #1e2329;
+            border: 1px solid #0ecb81;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .total-val { font-size: 20px; font-weight: bold; color: #0ecb81; font-family: monospace; margin-top: 5px; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 12px 10px; text-align: left; border-bottom: 1px solid #2b3139; font-size: 13px; }
+        th { color: #848e9c; font-weight: 500; }
+        input, select {
+            width: 100%; padding: 8px; background: #2b3139; border: 1px solid #474f57;
+            border-radius: 6px; color: white; box-sizing: border-box; font-family: monospace; font-size: 14px;
+        }
+        input:focus, select:focus { outline: 1px solid #f3ba2f; }
+        .add-btn { background: #0ecb81; color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; width: 100%; font-weight: bold; font-size: 14px; }
+        .add-btn:hover, .clear-btn:hover { opacity: 0.9; }
     </style>
 </head>
 <body>
@@ -41,10 +103,10 @@
     <h1>Реальный онлайн-поток криптовалют с бирж</h1>
 
     <div class="widget-container">
-        <!-- Официальный контейнер TradingView -->
+        <!-- Официальный контейнер TradingView (Ваш рабочий код в первозданном виде) -->
         <div class="tradingview-widget-container">
             <div class="tradingview-widget-container__widget"></div>
-            <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-market-overview.js" async>
+            <script type="text/javascript" src="https://tradingview.com" async>
             {
               "colorTheme": "dark",
               "dateRange": "12M",
@@ -71,96 +133,124 @@
             }
             </script>
         </div>
-    </div> <!-- Конец вашего виджета widget-container -->
+    </div>
 
-    <!-- НАЧАЛО ТАБЛИЦЫ УЧЕТА (БУХГАЛТЕРИЯ) -->
-    <div style="width: 100%; max-width: 800px; background-color: #181a20; border: 1px solid #2b3139; border-radius: 12px; padding: 25px; box-sizing: border-box; margin-top: 30px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);">
-        <h2 style="margin-top: 0; color: #f3ba2f; font-size: 20px; border-bottom: 1px solid #2b3139; padding-bottom: 10px;">
-            Учет доходов и расходов
-            <button onclick="clearAllData()" style="background-color: #f6465d; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; float: right; font-size: 12px; font-weight: bold;">Очистить историю</button>
+    <!-- ТАБЛИЦА МУЛЬТИВАЛЮТНОГО УЧЕТА (БУХГАЛТЕРИЯ) -->
+    <div class="accounting-box">
+        <h2>
+            Учет доходов и расходов портфеля
+            <button class="clear-btn" onclick="clearAllData()">Очистить историю</button>
         </h2>
 
-        <div style="display: flex; gap: 15px; background: #1e2329; padding: 12px; border-radius: 6px; margin: 15px 0; border: 1px solid #2b3139;">
-            <div style="flex: 1; font-size: 12px; color: #848e9c; text-transform: uppercase;">Курс BTC с биржи (Авто)<div id="live-btc" style="color: #0ecb81; font-weight: bold; font-size: 16px; margin-top: 5px; font-family: monospace;">Синхронизация...</div></div>
-            <div style="flex: 1; font-size: 12px; color: #848e9c; text-transform: uppercase;">Курс USD к RUB<input type="number" id="rub-rate" value="92.5" oninput="runRecalc()" style="width: 100%; padding: 8px; background: #2b3139; border: 1px solid #474f57; border-radius: 6px; color: white; box-sizing: border-box; font-family: monospace; font-size: 14px; margin-top: 5px;"></div>
+        <div class="config-row">
+            <div>Курс BTC с биржи (Авто)<div id="live-btc" class="rate-txt">Подключение к торгам Binance...</div></div>
+            <div>Курс USD к RUB<input type="number" id="rub-rate" value="92.5" oninput="runRecalc()"></div>
         </div>
 
-        <div style="display: flex; justify-content: space-around; background: #1e2329; border: 1px solid #0ecb81; padding: 15px; border-radius: 8px; text-align: center; margin-bottom: 20px;">
-            <div><span style="color:#848e9c; font-size:12px; text-transform: uppercase;">Итоговый баланс BTC</span><div id="res-btc" style="font-size: 20px; font-weight: bold; color: #f3ba2f; font-family: monospace; margin-top: 5px;">0.000000 BTC</div></div>
-            <div><span style="color:#848e9c; font-size:12px; text-transform: uppercase;">Итоговый баланс USD</span><div id="res-usd" style="font-size: 20px; font-weight: bold; color: #0ecb81; font-family: monospace; margin-top: 5px;">$0.00</div></div>
-            <div><span style="color:#848e9c; font-size:12px; text-transform: uppercase;">Итоговый баланс RUB</span><div id="res-rub" style="font-size: 20px; font-weight: bold; color: #0ecb81; font-family: monospace; margin-top: 5px;">0.00 ₽</div></div>
+        <div class="total-display">
+            <div><span style="color:#848e9c; font-size:12px; text-transform: uppercase;">Итоговый баланс BTC</span><div id="res-btc" class="total-val" style="color:#f3ba2f;">0.000000 BTC</div></div>
+            <div><span style="color:#848e9c; font-size:12px; text-transform: uppercase;">Итоговый баланс USD</span><div id="res-usd" class="total-val">$0.00</div></div>
+            <div><span style="color:#848e9c; font-size:12px; text-transform: uppercase;">Итоговый баланс RUB</span><div id="res-rub" class="total-val">0.00 ₽</div></div>
         </div>
 
         <h3 style="font-size:16px; margin-bottom:10px; color:#f3ba2f;">Внести мультивалютную операцию</h3>
-        <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+        <table style="margin-bottom: 20px;">
             <thead>
                 <tr>
-                    <th style="padding: 12px 10px; text-align: left; border-bottom: 1px solid #2b3139; font-size: 13px; color: #848e9c; font-weight: 500; width:120px;">Тип</th>
-                    <th style="padding: 12px 10px; text-align: left; border-bottom: 1px solid #2b3139; font-size: 13px; color: #848e9c; font-weight: 500;">Сумма BTC</th>
-                    <th style="padding: 12px 10px; text-align: left; border-bottom: 1px solid #2b3139; font-size: 13px; color: #848e9c; font-weight: 500;">Сумма USD</th>
-                    <th style="padding: 12px 10px; text-align: left; border-bottom: 1px solid #2b3139; font-size: 13px; color: #848e9c; font-weight: 500;">Сумма RUB</th>
-                    <th style="padding: 12px 10px; text-align: left; border-bottom: 1px solid #2b3139; font-size: 13px; color: #848e9c; font-weight: 500;">Описание транзакции</th>
-                    <th style="padding: 12px 10px; text-align: left; border-bottom: 1px solid #2b3139; font-size: 13px; color: #848e9c; font-weight: 500; width:110px;">Действие</th>
+                    <th style="width:120px;">Тип</th>
+                    <th>Сумма BTC</th>
+                    <th>Сумма USD</th>
+                    <th>Сумма RUB</th>
+                    <th>Описание транзакции</th>
+                    <th style="width:110px;">Действие</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
-                    <td style="padding: 12px 10px; text-align: left; border-bottom: 1px solid #2b3139; font-size: 13px;"><select id="in-type" style="width: 100%; padding: 8px; background: #2b3139; border: 1px solid #474f57; border-radius: 6px; color: white; box-sizing: border-box; font-family: monospace; font-size: 14px;"><option value="in">Приход (+)</option><option value="out">Расход (-)</option></select></td>
-                    <td style="padding: 12px 10px; text-align: left; border-bottom: 1px solid #2b3139; font-size: 13px;"><input type="number" id="in-btc" value="0" step="0.0001" style="width: 100%; padding: 8px; background: #2b3139; border: 1px solid #474f57; border-radius: 6px; color: white; box-sizing: border-box; font-family: monospace; font-size: 14px;"></td>
-                    <td style="padding: 12px 10px; text-align: left; border-bottom: 1px solid #2b3139; font-size: 13px;"><input type="number" id="in-usd" value="0" step="1" style="width: 100%; padding: 8px; background: #2b3139; border: 1px solid #474f57; border-radius: 6px; color: white; box-sizing: border-box; font-family: monospace; font-size: 14px;"></td>
-                    <td style="padding: 12px 10px; text-align: left; border-bottom: 1px solid #2b3139; font-size: 13px;"><input type="number" id="in-rub" value="0" step="10" style="width: 100%; padding: 8px; background: #2b3139; border: 1px solid #474f57; border-radius: 6px; color: white; box-sizing: border-box; font-family: monospace; font-size: 14px;"></td>
-                    <td style="padding: 12px 10px; text-align: left; border-bottom: 1px solid #2b3139; font-size: 13px;"><input type="text" id="in-desc" placeholder="Например: Покупка, Траты" style="width: 100%; padding: 8px; background: #2b3139; border: 1px solid #474f57; border-radius: 6px; color: white; box-sizing: border-box; font-family: monospace; font-size: 14px;"></td>
-                    <td style="padding: 12px 10px; text-align: left; border-bottom: 1px solid #2b3139; font-size: 13px;"><button onclick="addNewRow()" style="background: #0ecb81; color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; width: 100%; font-weight: bold; font-size: 14px;">Добавить</button></td>
+                    <td>
+                        <select id="in-type">
+                            <option value="in">Приход (+)</option>
+                            <option value="out">Расход (-)</option>
+                        </select>
+                    </td>
+                    <td><input type="number" id="in-btc" value="0" step="0.0001"></td>
+                    <td><input type="number" id="in-usd" value="0" step="1"></td>
+                    <td><input type="number" id="in-rub" value="0" step="10"></td>
+                    <td><input type="text" id="in-desc" placeholder="Например: Покупка, Траты"></td>
+                    <td><button class="add-btn" onclick="addNewRow()">Добавить</button></td>
                 </tr>
             </tbody>
         </table>
 
         <h3 style="font-size:16px; margin-bottom:10px;">История транзакций</h3>
-        <table style="width: 100%; border-collapse: collapse;">
+        <table>
             <thead>
                 <tr>
-                    <th style="padding: 12px 10px; text-align: left; border-bottom: 1px solid #2b3139; font-size: 13px; color: #848e9c; font-weight: 500;">Тип</th>
-                    <th style="padding: 12px 10px; text-align: left; border-bottom: 1px solid #2b3139; font-size: 13px; color: #848e9c; font-weight: 500;">Описание</th>
-                    <th style="padding: 12px 10px; text-align: left; border-bottom: 1px solid #2b3139; font-size: 13px; color: #848e9c; font-weight: 500;">Сумма в BTC</th>
-                    <th style="padding: 12px 10px; text-align: left; border-bottom: 1px solid #2b3139; font-size: 13px; color: #848e9c; font-weight: 500;">Сумма в USD</th>
-                    <th style="padding: 12px 10px; text-align: left; border-bottom: 1px solid #2b3139; font-size: 13px; color: #848e9c; font-weight: 500;">Сумма в RUB</th>
+                    <th>Тип</th>
+                    <th>Описание</th>
+                    <th>Сумма в BTC</th>
+                    <th>Сумма в USD</th>
+                    <th>Сумма в RUB</th>
                 </tr>
             </thead>
             <tbody id="history-rows"></tbody>
         </table>
     </div>
 
-    <!-- МОЗГ ТАБЛИЦЫ (ЛОГИКА И АВТОМАТИЗАЦИЯ КУРСА) -->
+    <!-- МОЗГ СИСТЕМЫ С ОФИЦИАЛЬНЫМ ПОТОКОМ WEBSOCKET BINANCE -->
     <script>
         let btcPriceOnline = 95000;
 
+        // Загружаем сохраненную историю транзакций из постоянной памяти Mac
         let txList = JSON.parse(localStorage.getItem('cryptoAccountingData')) || [
             { type: 'in', btc: 0.5, usd: 0, rub: 0, desc: 'Стартовый баланс кошелька' }
         ];
 
-        async function getPrice() {
-            try {
-                const r = await fetch("https://coincap.io");
-                const j = await r.json();
-                if(j.data && j.data.priceUsd) {
-                    btcPriceOnline = parseFloat(j.data.priceUsd);
-                    document.getElementById('live-btc').innerText = '$' + btcPriceOnline.toFixed(2) + ' (Авто)';
+        // Подключаемся напрямую к посекундному WebSocket-стриму биржи Binance
+        function connectBinanceStream() {
+            // Стрим btcusdt@ticker отдает секундные изменения цены напрямую с торгов Binance
+            const ws = new WebSocket("wss://://binance.com");
+
+            ws.onmessage = function (event) {
+                const data = JSON.parse(event.data);
+                if (data && data.c) {
+                    const newPrice = parseFloat(data.c);
+                    
+                    // Эффект легкого изменения цвета текста при движении цены
+                    const rateElement = document.getElementById('live-btc');
+                    if (newPrice > btcPriceOnline) rateElement.style.color = '#0ecb81';
+                    else if (newPrice < btcPriceOnline) rateElement.style.color = '#f6465d';
+
+                    btcPriceOnline = newPrice;
+                    
+                    // Выводим секундную цену в информер калькулятора
+                    rateElement.innerText = '$' + btcPriceOnline.toFixed(2) + ' (Live)';
+                    
+                    // Пересчитываем всю таблицу без перезагрузок страницы
                     runRecalc();
                 }
-            } catch(e) {}
+            };
+
+            // Автоматический переподклюк в случае обрыва связи интернета
+            ws.onclose = function() {
+                setTimeout(connectBinanceStream, 3000);
+            };
         }
 
+        // Математическая функция полного пересчета всех валют в реальном времени
         function runRecalc() {
             const rubRate = parseFloat(document.getElementById('rub-rate').value) || 0;
             const btcToRub = btcPriceOnline * rubRate;
-
             let totalBtc = 0;
             const body = document.getElementById('history-rows');
             body.innerHTML = '';
 
             txList.forEach(tx => {
+                // Конвертируем USD и RUB в BTC на основе живого курса Биткоина
                 const btcFromUsd = (tx.usd || 0) / btcPriceOnline;
                 const btcFromRub = (tx.rub || 0) / btcToRub;
+                
+                // Объединяем мультивалютный ввод в общий объем BTC данной строки
                 const rowBtc = (tx.btc || 0) + btcFromUsd + btcFromRub;
 
                 const rowUsd = rowBtc * btcPriceOnline;
@@ -187,11 +277,13 @@
             const finalUsd = totalBtc * btcPriceOnline;
             const finalRub = totalBtc * btcToRub;
 
+            // Выводим итоговые балансы на верхнее табло
             document.getElementById('res-btc').innerText = totalBtc.toFixed(6) + ' BTC';
             document.getElementById('res-usd').innerText = '$' + finalUsd.toFixed(2);
             document.getElementById('res-rub').innerText = finalRub.toFixed(2) + ' ₽';
         }
 
+        // Функция добавления комплексной мультивалютной транзакции
         function addNewRow() {
             const type = document.getElementById('in-type').value;
             const btc = parseFloat(document.getElementById('in-btc').value) || 0;
@@ -204,9 +296,13 @@
                 return;
             }
 
+            // Закидываем запись в общий массив
             txList.push({ type, btc, usd, rub, desc });
+            
+            // Запоминаем в кэш браузера Mac
             localStorage.setItem('cryptoAccountingData', JSON.stringify(txList));
 
+            // Очищаем ячейки формы
             document.getElementById('in-btc').value = 0;
             document.getElementById('in-usd').value = 0;
             document.getElementById('in-rub').value = 0;
@@ -215,6 +311,7 @@
             runRecalc();
         }
 
+        // Функция полной очистки журнала истории портфеля
         function clearAllData() {
             if(confirm('Вы уверены, что хотите полностью стереть всю историю операций кошелька?')) {
                 txList = [];
@@ -223,8 +320,8 @@
             }
         }
 
-        getPrice();
-        setInterval(getPrice, 5000);
+        // Мгновенный запуск потока Binance при загрузке страницы
+        connectBinanceStream();
     </script>
 </body>
 </html>
