@@ -41,17 +41,37 @@
     <h1>Реальный онлайн-поток криптовалют с бирж</h1>
 
     <div class="widget-container">
-        <iframe 
-            src="https://tradingview.com%" 
-            width="100%" 
-            height="100%" 
-            frameborder="0" 
-            allowtransparency="true" 
-            scrolling="no" 
-            style="display:block; box-sizing: border-box;">
-        </iframe>
+        <!-- Официальный контейнер TradingView -->
+        <div class="tradingview-widget-container">
+            <div class="tradingview-widget-container__widget"></div>
+            <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-market-overview.js" async>
+            {
+              "colorTheme": "dark",
+              "dateRange": "12M",
+              "showChart": true,
+              "locale": "ru",
+              "width": "100%",
+              "height": "100%",
+              "largeChartUrl": "",
+              "isTransparent": false,
+              "showSymbolLogo": true,
+              "showFloatingTooltip": false,
+              "tabs": [
+                {
+                  "title": "Криптовалюты Live",
+                  "symbols": [
+                    { "s": "BINANCE:BTCUSDT", "d": "Bitcoin (BTC)" },
+                    { "s": "BINANCE:ETHUSDT", "d": "Ethereum (ETH)" },
+                    { "s": "BINANCE:SOLUSDT", "d": "Solana (SOL)" },
+                    { "s": "BINANCE:TONUSDT", "d": "Toncoin (TON)" },
+                    { "s": "BINANCE:XRPUSDT", "d": "Ripple (XRP)" }
+                  ]
+                }
+              ]
+            }
+            </script>
+        </div>
     </div>
 
 </body>
 </html>
-
