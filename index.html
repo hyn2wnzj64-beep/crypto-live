@@ -3,46 +3,101 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Крипто-Бухгалтерия Live</title>
+    <title>Настоящие Курсы Биржи Live и Бухгалтерия</title>
     <style>
         body {
             margin: 0;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background-color: #0b0e11;
-            color: #eaecef;
-            padding: 40px 20px;
-        }
-        .container {
-            max-width: 850px;
-            margin: 0 auto;
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            min-height: 100vh;
+            padding: 20px;
+            box-sizing: border-box;
         }
         h1 {
             color: #f3ba2f;
+            font-size: 24px;
+            margin-bottom: 20px;
             text-align: center;
-            margin-bottom: 5px;
         }
-        .subtitle {
-            text-align: center;
-            color: #848e9c;
+        .widget-container {
+            width: 100%;
+            max-width: 900px;
+            height: 400px;
+            background-color: #131722;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+            border: 1px solid #2a2e39;
             margin-bottom: 30px;
-            font-size: 14px;
         }
-        .total-balance {
-            background-color: #1e2329;
-            border: 1px solid #f3ba2f;
+        .accounting-container {
+            width: 100%;
+            max-width: 900px;
+            background-color: #181a20;
+            border: 1px solid #2b3139;
             border-radius: 12px;
             padding: 25px;
+            box-sizing: border-box;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+        }
+        .accounting-container h2 {
+            margin-top: 0;
+            color: #f3ba2f;
+            font-size: 20px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #2b3139;
+            padding-bottom: 10px;
+        }
+        /* Блок настроек курса и фиатной валюты */
+        .config-bar {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            background-color: #1e2329;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            border: 1px solid #2b3139;
+        }
+        .config-item {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            flex: 1;
+            min-width: 150px;
+        }
+        .config-item label {
+            color: #848e9c;
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+        /* Главное табло баланса */
+        .total-box {
+            display: flex;
+            justify-content: space-around;
+            background-color: #1e2329;
+            border: 1px solid #0ecb81;
+            border-radius: 8px;
+            padding: 20px;
             text-align: center;
             margin-bottom: 25px;
         }
-        .total-balance h2 {
-            margin: 0 0 10px 0;
+        .balance-item {
+            flex: 1;
+        }
+        .total-label {
             color: #848e9c;
-            font-size: 16px;
+            font-size: 13px;
             text-transform: uppercase;
+            margin-bottom: 5px;
         }
         .total-amount {
-            font-size: 32px;
+            font-size: 24px;
             font-weight: bold;
             color: #0ecb81;
             font-family: monospace;
@@ -50,34 +105,20 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            background-color: #181a20;
-            border-radius: 12px;
-            overflow: hidden;
+            margin-bottom: 20px;
         }
         th, td {
-            padding: 15px 20px;
+            padding: 12px 10px;
             text-align: left;
             border-bottom: 1px solid #2b3139;
+            font-size: 14px;
         }
         th {
-            background-color: #21262c;
             color: #848e9c;
             font-weight: 500;
         }
-        tr:hover {
-            background-color: #21262c;
-        }
-        .coin-name {
-            font-weight: bold;
-            color: #ffffff;
-        }
-        .price, .subtotal {
-            font-family: monospace;
-            font-size: 16px;
-            font-weight: bold;
-        }
-        input {
-            width: 90px;
+        input, select {
+            width: 100%;
             padding: 8px;
             background-color: #2b3139;
             border: 1px solid #474f57;
@@ -85,137 +126,244 @@
             color: #ffffff;
             font-family: monospace;
             font-size: 14px;
-            text-align: center;
+            box-sizing: border-box;
         }
-        input:focus {
+        input:focus, select:focus {
             outline: 1px solid #f3ba2f;
         }
+        .btn-add {
+            background-color: #0ecb81;
+            color: #ffffff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+            transition: opacity 0.2s;
+        }
+        .btn-add:hover { opacity: 0.9; }
+        .type-income { color: #0ecb81; font-weight: bold; }
+        .type-expense { color: #f6465d; font-weight: bold; }
+        .val-btc { font-family: monospace; font-weight: bold; color: #f3ba2f; }
+        .val-money { font-family: monospace; font-weight: bold; color: #ffffff; }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <h1>Крипто-Бухгалтерия Live</h1>
-        <div class="subtitle">Цены обновляются напрямую с Binance через защищенный шлюз</div>
+    <h1>Реальный онлайн-поток криптовалют с бирж</h1>
 
-        <!-- Общий баланс кошелька -->
-        <div class="total-balance">
-            <h2>Общая стоимость активов (USD)</h2>
-            <div class="total-amount" id="total-portfolio-value">$0.00</div>
+    <!-- 1. ВАШ СТАБИЛЬНЫЙ РАБОЧИЙ ВИДЖЕТ ТРАНСЛЯЦИИ КУРСОВ -->
+    <div class="widget-container">
+        <div class="tradingview-widget-container">
+            <div class="tradingview-widget-container__widget"></div>
+            <script type="text/javascript" src="https://tradingview.com" async>
+            {
+              "colorTheme": "dark",
+              "dateRange": "12M",
+              "showChart": true,
+              "locale": "ru",
+              "width": "100%",
+              "height": "100%",
+              "largeChartUrl": "",
+              "isTransparent": false,
+              "showSymbolLogo": true,
+              "showFloatingTooltip": false,
+              "tabs": [
+                {
+                  "title": "Криптовалюты Live",
+                  "symbols": [
+                    { "s": "BINANCE:BTCUSDT", "d": "Bitcoin (BTC)" },
+                    { "s": "BINANCE:ETHUSDT", "d": "Ethereum (ETH)" },
+                    { "s": "BINANCE:SOLUSDT", "d": "Solana (SOL)" },
+                    { "s": "BINANCE:TONUSDT", "d": "Toncoin (TON)" },
+                    { "s": "BINANCE:XRPUSDT", "d": "Ripple (XRP)" }
+                  ]
+                }
+              ]
+            }
+            </script>
+        </div>
+    </div>
+
+    <!-- 2. БЛОК ТАБЛИЦЫ-БУХГАЛТЕРИИ -->
+    <div class="accounting-container">
+        <h2>Учет доходов и расходов в BTC - USD - RUB</h2>
+        
+        <!-- Ввод текущих курсов для расчетов -->
+        <div class="config-bar">
+            <div class="config-item">
+                <label>Текущий курс BTC в USD (из виджета)</label>
+                <input type="number" id="btc-usd-rate" value="95000" oninput="calculateTotalBalance()">
+            </div>
+            <div class="config-item">
+                <label>Текущий курс USD в RUB</label>
+                <input type="number" id="usd-rub-rate" value="92.5" oninput="calculateTotalBalance()">
+            </div>
         </div>
 
-        <!-- Таблица активов -->
-        <table>
+        <!-- Итоговый чистый баланс (Доходы минус Расходы) -->
+        <div class="total-box">
+            <div class="balance-item">
+                <div class="total-label">Чистый баланс в BTC</div>
+                <div class="total-amount" id="total-btc" style="color: #f3ba2f;">0.00000000 BTC</div>
+            </div>
+            <div class="balance-item">
+                <div class="total-label">Чистый баланс в USD</div>
+                <div class="total-amount" id="total-usd">$0.00</div>
+            </div>
+            <div class="balance-item">
+                <div class="total-label">Чистый баланс в RUB</div>
+                <div class="total-amount" id="total-rub">0.00 ₽</div>
+            </div>
+        </div>
+
+        <!-- Таблица для внесения записей -->
+        <h3>Добавить операцию</h3>
+        <table style="margin-bottom: 15px;">
             <thead>
                 <tr>
-                    <th>Монета</th>
-                    <th>Живой курс (USD)</th>
-                    <th>Ваше количество</th>
-                    <th>Стоимость (USD)</th>
+                    <th style="width: 150px;">Тип</th>
+                    <th style="width: 150px;">Количество</th>
+                    <th style="width: 150px;">Валюта ввода</th>
+                    <th>Описание транзакции</th>
+                    <th style="width: 120px;">Действие</th>
                 </tr>
             </thead>
             <tbody>
-                <!-- Строка Bitcoin -->
                 <tr>
-                    <td><span class="coin-name">Bitcoin (BTC)</span></td>
-                    <td class="price" id="btc-price">Загрузка...</td>
-                    <td><input type="number" id="btc-amount" value="0.5" step="0.01" min="0"></td>
-                    <td class="subtotal" id="btc-subtotal">$0.00</td>
+                    <td>
+                        <select id="tx-type">
+                            <option value="income">Приход (+)</option>
+                            <option value="expense">Расход (-)</option>
+                        </select>
+                    </td>
+                    <td><input type="number" id="tx-amount" value="0.1" step="0.001" min="0"></td>
+                    <td>
+                        <select id="tx-currency">
+                            <option value="BTC">BTC</option>
+                            <option value="USD">USD</option>
+                            <option value="RUB">RUB</option>
+                        </select>
+                    </td>
+                    <td><input type="text" id="tx-desc" placeholder="Например: Зарплата, Покупка на бирже, Траты"></td>
+                    <td><button class="btn-add" onclick="addTransaction()">Добавить</button></td>
                 </tr>
-                <!-- Строка Ethereum -->
+            </tbody>
+        </table>
+
+        <!-- История операций -->
+        <h3>История транзакций</h3>
+        <table id="history-table">
+            <thead>
                 <tr>
-                    <td><span class="coin-name">Ethereum (ETH)</span></td>
-                    <td class="price" id="eth-price">Загрузка...</td>
-                    <td><input type="number" id="eth-amount" value="2.0" step="0.1" min="0"></td>
-                    <td class="subtotal" id="eth-subtotal">$0.00</td>
+                    <th>Тип</th>
+                    <th>Описание</th>
+                    <th>Сумма в BTC</th>
+                    <th>Сумма в USD</th>
+                    <th>Сумма в RUB</th>
                 </tr>
-                <!-- Строка Solana -->
-                <tr>
-                    <td><span class="coin-name">Solana (SOL)</span></td>
-                    <td class="price" id="sol-price">Загрузка...</td>
-                    <td><input type="number" id="sol-amount" value="15" step="1" min="0"></td>
-                    <td class="subtotal" id="sol-subtotal">$0.00</td>
-                </tr>
+            </thead>
+            <tbody id="history-body">
+                <!-- Сюда скрипт добавляет новые строки транзакций -->
             </tbody>
         </table>
     </div>
 
     <script>
-        // Глобальный объект для хранения текущих цен биржи
-        const cryptoPrices = { bitcoin: 0, ethereum: 0,  solana: 0 };
+        // Массив, где хранятся все внесенные транзакции
+        // Изначально закинем туда 2 тестовые строки (один приход и один расход) для примера
+        let transactions = [
+            { type: 'income', amount: 0.5, currency: 'BTC', desc: 'Начальный баланс кошелька' },
+            { type: 'expense', amount: 500, currency: 'USD', desc: 'Покупка подписок' }
+        ];
 
-        // Элементы ввода количества монет
-        const amounts = {
-            bitcoin: document.getElementById('btc-amount'),
-            ethereum: document.getElementById('eth-amount'),
-            solana: document.getElementById('sol-amount')
-        };
+        // Главная математическая функция пересчета баланса
+        function calculateTotalBalance() {
+            // Берем курсы из полей ввода
+            const btcUsdRate = parseFloat(document.getElementById('btc-usd-rate').value) || 0;
+            const usdRubRate = parseFloat(document.getElementById('usd-rub-rate').value) || 0;
+            const btcRubRate = btcUsdRate * usdRubRate; // Рассчитываем курс BTC к рублю
 
-        // Элементы вывода результатов
-        const priceElements = {
-            bitcoin: document.getElementById('btc-price'),
-            ethereum: document.getElementById('eth-price'),
-            solana: document.getElementById('sol-price')
-        };
+            let totalBtc = 0;
+            const historyBody = document.getElementById('history-body');
+            historyBody.innerHTML = ''; // Очищаем таблицу перед перерисовкой
 
-        const subtotalElements = {
-            bitcoin: document.getElementById('btc-subtotal'),
-            ethereum: document.getElementById('eth-subtotal'),
-            solana: document.getElementById('sol-subtotal')
-        };
+            transactions.forEach(tx => {
+                let amountInBtc = 0;
 
-        const totalPortfolioElement = document.getElementById('total-portfolio-value');
+                // Переводим валюту транзакции в эталонный BTC на основе курсов
+                if (tx.currency === 'BTC') {
+                    amountInBtc = tx.amount;
+                } else if (tx.currency === 'USD') {
+                    amountInBtc = tx.amount / btcUsdRate;
+                } else if (tx.currency === 'RUB') {
+                    amountInBtc = tx.amount / btcRubRate;
+                }
 
-        // Функция математического пересчета всей бухгалтерии
-        function calculateAccounting() {
-            let totalPortfolioSum = 0;
+                // Считаем эквиваленты в фиате для текущей строки истории
+                const amountInUsd = amountInBtc * btcUsdRate;
+                const amountInRub = amountInBtc * btcUsdRate * usdRubRate;
 
-            for (const coin in cryptoPrices) {
-                const price = cryptoPrices[coin];
-                // Получаем количество из поля ввода, если там пусто — считаем за 0
-                const amount = parseFloat(amounts[coin].value) || 0; 
-                
-                // Считаем стоимость конкретной монеты (Цена * Количество)
-                const subtotal = price * amount;
-                totalPortfolioSum += subtotal;
+                // Если это приход — плюсуем к балансу, если расход — вычитаем
+                if (tx.type === 'income') {
+                    totalBtc += amountInBtc;
+                } else {
+                    totalBtc -= amountInBtc;
+                }
 
-                // Выводим стоимость этой позиции на экран
-                subtotalElements[coin].innerText = '$' + subtotal.toFixed(2);
-            }
+                // Форматируем знаки + или - для таблицы истории
+                const sign = tx.type === 'income' ? '+' : '-';
+                const typeClass = tx.type === 'income' ? 'type-income' : 'type-expense';
+                const typeText = tx.type === 'income' ? 'Приход' : 'Расход';
 
-            // Выводим Общую итоговую сумму кошелька
-            totalPortfolioElement.innerText = '$' + totalPortfolioSum.toFixed(2);
+                // Добавляем красивую готовую строчку в таблицу истории
+                historyBody.innerHTML += `
+                    <tr>
+                        <td class="${typeClass}">${typeText}</td>
+                        <td>${tx.desc || 'Без описания'}</td>
+                        <td class="val-btc">${sign}${amountInBtc.toFixed(6)} BTC</td>
+                        <td class="val-money">${sign}$${amountInUsd.toFixed(2)}</td>
+                        <td class="val-money">${sign}${amountInRub.toFixed(2)} ₽</td>
+                    </tr>
+                `;
+            });
+
+            // Считаем финальные общие итоги всего кошелька во всех 3 валютах
+            const totalUsd = totalBtc * btcUsdRate;
+            const totalRub = totalBtc * btcUsdRate * usdRubRate;
+
+            // Выводим результаты на верхние табло
+            document.getElementById('total-btc').innerText = totalBtc.toFixed(8) + ' BTC';
+            document.getElementById('total-usd').innerText = '$' + totalUsd.toFixed(2);
+            document.getElementById('total-rub').innerText = totalRub.toFixed(2) + ' ₽';
         }
 
-        // Запрашиваем цены у официального API (поддерживает Safari и https://)
-        async function fetchLivePrices() {
-            try {
-                const response = await fetch("https://coincap.io");
-                const json = await response.json();
-                
-                json.data.forEach(coin => {
-                    const price = parseFloat(coin.priceUsd);
-                    cryptoPrices[coin.id] = price;
-                    
-                    // Обновляем живую цену в таблице
-                    priceElements[coin.id].innerText = '$' + price.toFixed(2);
-                });
+        // Функция добавления новой строки из полей ввода
+        function addTransaction() {
+            const type = document.getElementById('tx-type').value;
+            const amount = parseFloat(document.getElementById('tx-amount').value) || 0;
+            const currency = document.getElementById('tx-currency').value;
+            const desc = document.getElementById('tx-desc').value;
 
-                // После обновления цен сразу пересчитываем бухгалтерию
-                calculateAccounting();
-            } catch (error) {
-                console.error("Ошибка обновления котировок");
+            if (amount <= 0) {
+                alert('Пожалуйста, введите корректное количество больше 0');
+                return;
             }
+
+            // Добавляем новую транзакцию в общий список
+            transactions.push({ type, amount, currency, desc });
+
+            // Очищаем поля ввода количества и описания для следующей записи
+            document.getElementById('tx-amount').value = '0.1';
+            document.getElementById('tx-desc').value = '';
+
+            // Сразу же запускаем полный пересчет и обновление экрана
+            calculateTotalBalance();
         }
 
-        // Слушаем изменения в полях ввода (если пользователь меняет количество монет вручную)
-        Object.values(amounts).forEach(input => {
-            input.addEventListener('input', calculateAccounting);
-        });
-
-        // Запуск: мгновенный опрос и обновление каждые 3 секунды
-        fetchLivePrices();
-        setInterval(fetchLivePrices, 3000);
+        // Запуск первоначального расчета при открытии страницы
+        calculateTotalBalance();
     </script>
 </body>
 </html>
