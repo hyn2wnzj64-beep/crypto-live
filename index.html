@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Настоящие Курсы Биржи Live и Бухгалтерия</title>
+    <title>Умная Крипто-Бухгалтерия Live</title>
     <style>
         body {
             margin: 0;
@@ -26,7 +26,7 @@
         }
         .accounting-container {
             width: 100%;
-            max-width: 800px;
+            max-width: 900px;
             background-color: #181a20;
             border: 1px solid #2b3139;
             border-radius: 12px;
@@ -64,6 +64,13 @@
             color: #848e9c;
             font-size: 12px;
             text-transform: uppercase;
+        }
+        .rate-auto {
+            color: #0ecb81;
+            font-weight: bold;
+            font-family: monospace;
+            font-size: 16px;
+            padding: 8px 0;
         }
         .total-box {
             display: flex;
@@ -123,7 +130,7 @@
             background-color: #0ecb81;
             color: #ffffff;
             border: none;
-            padding: 10px 20px;
+            padding: 10px 15px;
             border-radius: 6px;
             cursor: pointer;
             font-weight: bold;
@@ -131,7 +138,20 @@
             transition: opacity 0.2s;
             width: 100%;
         }
-        .btn-add:hover { opacity: 0.9; }
+        .btn-clear {
+            background-color: #f6465d;
+            color: #ffffff;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 12px;
+            transition: opacity 0.2s;
+            float: right;
+            margin-top: -5px;
+        }
+        .btn-add:hover, .btn-clear:hover { opacity: 0.9; }
         .type-income { color: #0ecb81; font-weight: bold; }
         .type-expense { color: #f6465d; font-weight: bold; }
         .val-btc { font-family: monospace; font-weight: bold; color: #f3ba2f; }
@@ -139,7 +159,7 @@
         
         .widget-container {
             width: 100%;
-            max-width: 800px;
+            max-width: 900px;
             height: 500px;
             background-color: #131722;
             border-radius: 12px;
@@ -151,14 +171,16 @@
 </head>
 <body>
 
-    <!-- БЛОК ТАБЛИЦЫ-БУХГАЛТЕРИИ -->
     <div class="accounting-container">
-        <h2>Учет доходов и расходов портфеля</h2>
+        <h2>
+            Учет доходов и расходов портфеля
+            <button class="btn-clear" onclick="clearHistory()">Очистить историю</button>
+        </h2>
         
         <div class="config-bar">
             <div class="config-item">
-                <label>Текущий курс BTC в USD (из информера ниже)</label>
-                <input type="number" id="btc-usd-rate" value="95000" oninput="calculateTotalBalance()">
+                <label>Курс BTC с биржи (Синхронизация)</label>
+                <div class="rate-auto" id="live-btc-rate">Связь со шлюзом Binance...</div>
             </div>
             <div class="config-item">
                 <label>Текущий курс USD в RUB</label>
@@ -181,15 +203,16 @@
             </div>
         </div>
 
-        <h3>Добавить операцию</h3>
+        <h3>Внести мультивалютную операцию</h3>
         <table style="margin-bottom: 15px;">
             <thead>
                 <tr>
-                    <th style="width: 130px;">Тип</th>
-                    <th style="width: 120px;">Количество</th>
-                    <th style="width: 110px;">Валюта</th>
+                    <th style="width: 120px;">Тип</th>
+                    <th style="width: 110px;">Сумма BTC</th>
+                    <th style="width: 110px;">Сумма USD</th>
+                    <th style="width: 110px;">Сумма RUB</th>
                     <th>Описание транзакции</th>
-                    <th style="width: 120px;">Действие</th>
+                    <th style="width: 110px;">Действие</th>
                 </tr>
             </thead>
             <tbody>
@@ -200,15 +223,10 @@
                             <option value="expense">Расход (-)</option>
                         </select>
                     </td>
-                    <td><input type="number" id="tx-amount" value="0.1" step="0.001" min="0"></td>
-                    <td>
-                        <select id="tx-currency">
-                            <option value="BTC">BTC</option>
-                            <option value="USD">USD</option>
-                            <option value="RUB">RUB</option>
-                        </select>
-                    </td>
-                    <td><input type="text" id="tx-desc" placeholder="Например: Покупка на бирже, Траты"></td>
+                    <td><input type="number" id="tx-btc" value="0" step="0.0001" min="0"></td>
+                    <td><input type="number" id="tx-usd" value="0" step="1" min="0"></td>
+                    <td><input type="number" id="tx-rub" value="0" step="10" min="0"></td>
+                    <td><input type="text" id="tx-desc" placeholder="Например: Покупка, Обмен, Продажа"></td>
                     <td><button class="btn-add" onclick="addTransaction()">Добавить</button></td>
                 </tr>
             </tbody>
@@ -231,11 +249,10 @@
 
     <h1>Реальный онлайн-поток криптовалют с бирж</h1>
 
-    <!-- ВАШ СТАБИЛЬНЫЙ РАБОЧИЙ ВИДЖЕТ ТРАНСЛЯЦИИ КУРСОВ -->
     <div class="widget-container">
         <div class="tradingview-widget-container">
             <div class="tradingview-widget-container__widget"></div>
-            <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-market-overview.js" async>
+            <script type="text/javascript" src="https://tradingview.com" async>
             {
               "colorTheme": "dark",
               "dateRange": "12M",
@@ -265,39 +282,53 @@
     </div>
 
     <script>
-        // Стартовый массив транзакций
-        let transactions = [
-            { type: 'income', amount: 0.5, currency: 'BTC', desc: 'Начальный баланс кошелька' },
-            { type: 'expense', amount: 500, currency: 'USD', desc: 'Покупка подписок' }
+        // Глобальная переменная для хранения живого курса Биткоина
+        let currentGlobalBtcPrice = 95000;
+
+        // Загружаем сохраненную историю из памяти браузера, либо создаем пустую
+        let transactions = JSON.parse(localStorage.getItem('myCryptoAccounting')) || [
+            { type: 'income', btc: 0.5, usd: 0, rub: 0, desc: 'Начальный баланс кошелька' }
         ];
 
+        // Функция автоматического перехвата цен из официального публичного шлюза TradingView/CoinCap для синхронизации
+        async function syncLivePrice() {
+            try {
+                const response = await fetch("https://coincap.io");
+                const json = await response.json();
+                if (json.data && json.data.priceUsd) {
+                    currentGlobalBtcPrice = parseFloat(json.data.priceUsd);
+                    document.getElementById('live-btc-rate').innerText = '$' + currentGlobalBtcPrice.toFixed(2) + ' (Авто)';
+                    // Как только курс обновился, мгновенно пересчитываем баланс
+                    calculateTotalBalance();
+                }
+            } catch (e) {
+                // Если сеть занята, держим базовый или прошлый курс
+            }
+        }
+
         function calculateTotalBalance() {
-            const btcUsdRate = parseFloat(document.getElementById('btc-usd-rate').value) || 0;
             const usdRubRate = parseFloat(document.getElementById('usd-rub-rate').value) || 0;
-            const btcRubRate = btcUsdRate * usdRubRate;
+            const btcRubRate = currentGlobalBtcPrice * usdRubRate;
 
             let totalBtc = 0;
             const historyBody = document.getElementById('history-body');
             historyBody.innerHTML = '';
 
             transactions.forEach(tx => {
-                let amountInBtc = 0;
+                // Высчитываем общий объем строки, переводя внесенные USD и RUB в BTC по текущему курсу
+                const btcFromUsd = (tx.usd || 0) / currentGlobalBtcPrice;
+                const btcFromRub = (tx.rub || 0) / btcRubRate;
+                
+                // Суммируем все три валюты из одной строки в единый эквивалент BTC
+                const rowTotalInBtc = (tx.btc || 0) + btcFromUsd + btcFromRub;
 
-                if (tx.currency === 'BTC') {
-                    amountInBtc = tx.amount;
-                } else if (tx.currency === 'USD') {
-                    amountInBtc = tx.amount / btcUsdRate;
-                } else if (tx.currency === 'RUB') {
-                    amountInBtc = tx.amount / btcRubRate;
-                }
-
-                const amountInUsd = amountInBtc * btcUsdRate;
-                const amountInRub = amountInBtc * btcUsdRate * usdRubRate;
+                const rowTotalInUsd = rowTotalInBtc * currentGlobalBtcPrice;
+                const rowTotalInRub = rowTotalInBtc * btcRubRate;
 
                 if (tx.type === 'income') {
-                    totalBtc += amountInBtc;
+                    totalBtc += rowTotalInBtc;
                 } else {
-                    totalBtc -= amountInBtc;
+                    totalBtc -= rowTotalInBtc;
                 }
 
                 const sign = tx.type === 'income' ? '+' : '-';
@@ -308,15 +339,15 @@
                     <tr>
                         <td class="${typeClass}">${typeText}</td>
                         <td>${tx.desc || 'Без описания'}</td>
-                        <td class="val-btc">${sign}${amountInBtc.toFixed(6)} BTC</td>
-                        <td class="val-money">${sign}$${amountInUsd.toFixed(2)}</td>
-                        <td class="val-money">${sign}${amountInRub.toFixed(2)} ₽</td>
+                        <td class="val-btc">${sign}${rowTotalInBtc.toFixed(6)} BTC</td>
+                        <td class="val-money">${sign}$${rowTotalInUsd.toFixed(2)}</td>
+                        <td class="val-money">${sign}${rowTotalInRub.toFixed(2)} ₽</td>
                     </tr>
                 `;
             });
 
-            const totalUsd = totalBtc * btcUsdRate;
-            const totalRub = totalBtc * btcUsdRate * usdRubRate;
+            const totalUsd = totalBtc * currentGlobalBtcPrice;
+            const totalRub = totalBtc * btcRubRate;
 
             document.getElementById('total-btc').innerText = totalBtc.toFixed(8) + ' BTC';
             document.getElementById('total-usd').innerText = '$' + totalUsd.toFixed(2);
@@ -325,24 +356,43 @@
 
         function addTransaction() {
             const type = document.getElementById('tx-type').value;
-            const amount = parseFloat(document.getElementById('tx-amount').value) || 0;
-            const currency = document.getElementById('tx-currency').value;
+            const btc = parseFloat(document.getElementById('tx-btc').value) || 0;
+            const usd = parseFloat(document.getElementById('tx-usd').value) || 0;
+            const rub = parseFloat(document.getElementById('tx-rub').value) || 0;
             const desc = document.getElementById('tx-desc').value;
 
-            if (amount <= 0) {
-                alert('Пожалуйста, введите корректное количество больше 0');
+            if (btc === 0 && usd === 0 && rub === 0) {
+                alert('Пожалуйста, введите сумму хотя бы в одной валюте');
                 return;
             }
 
-            transactions.push({ type, amount, currency, desc });
+            // Добавляем комплексную транзакцию
+            transactions.push({ type, btc, usd, rub, desc });
 
-            document.getElementById('tx-amount').value = '0.1';
+            // Сохраняем в постоянную память Mac
+            localStorage.setItem('myCryptoAccounting', JSON.stringify(transactions));
+
+            // Сбрасываем поля ввода
+            document.getElementById('tx-btc').value = '0';
+            document.getElementById('tx-usd').value = '0';
+            document.getElementById('tx-rub').value = '0';
             document.getElementById('tx-desc').value = '';
 
             calculateTotalBalance();
         }
 
-        calculateTotalBalance();
+        // Функция полной очистки истории
+        function clearHistory() {
+            if (confirm('Вы уверены, что хотите полностью очистить всю историю операций?')) {
+                transactions = [];
+                localStorage.removeItem('myCryptoAccounting');
+                calculateTotalBalance();
+            }
+        }
+
+        // Запуск: мгновенная синхронизация и обновление курса каждые 4 секунды
+        syncLivePrice();
+        setInterval(syncLivePrice, 4000);
     </script>
 </body>
 </html>
